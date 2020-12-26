@@ -27,7 +27,7 @@ func crearRegistro(registro string) {
 }
 
 func (s *Server) RecibirDeAdmin(ctx context.Context, in *Message) (*Message, error) { //cuando un admin envia una peticion
-	log.Printf("Cliente envía etición: %s", in.Mensaje)
+	log.Printf("Administrador envía petición: %s", in.Mensaje)
 	separar := strings.Split(in.Mensaje, " ")
 	if separar[0] == "create" {
 		crearRegistro(separar[1])
