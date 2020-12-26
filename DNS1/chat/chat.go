@@ -16,14 +16,14 @@ var ipActual int = 1
 type Server struct {
 }
 
-func crearRegistro(registro string) {
+func crearRegistro(registro string, ip string) {
 	registroSeparado := strings.Split(registro, ".")
 	nombre := "registros_zf/registro_" + registroSeparado[1] + ".txt"
 	f, err := os.OpenFile(nombre, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err2 := f.WriteString(registro + "\n")
+	_, err2 := f.WriteString(registro + " IN A " + ip + "\n")
 	if err2 != nil {
 		log.Fatal(err)
 	}
@@ -73,16 +73,61 @@ func updateReloj(registro string) {
 	}
 }
 
+func borrarRegistro(registro string) {
+	registroSeparado := strings.Split(registro, ".")
+	nombre := "registros_zf/registro_" + registroSeparado[1] + ".txt"
+	input, err := ioutil.ReadFile(nombre)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	lines := strings.Split(string(input), "\n")
+
+	for i, line := range lines {
+		if strings.Contains(line, registro) {
+			lines[i] = ""
+		}
+	}
+	output := strings.Join(lines, "\n")
+	err = ioutil.WriteFile(nombre, []byte(output), 0644)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
+func crearLog(accion string, registro string, ip string) {
+	registroSeparado := strings.Split(registro, ".")
+	nombre := "logs/log_" + registroSeparado[1] + ".txt"
+	f, err := os.OpenFile(nombre, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if accion != "delete" {
+		_, err2 := f.WriteString(accion + " " + registro + " " + ip + "\n")
+		if err2 != nil {
+			log.Fatal(err)
+		}
+	} else {
+		_, err2 := f.WriteString(accion + " " + registro + "\n")
+		if err2 != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
 func (s *Server) RecibirDeAdmin(ctx context.Context, in *Message) (*Message, error) { //cuando un admin envia una peticion
 	log.Printf("Administrador envía petición: %s", in.Mensaje)
 	separar := strings.Split(in.Mensaje, " ")
 	if separar[0] == "create" {
-		crearRegistro(separar[1])
+		crearRegistro(separar[1], separar[2])
 		updateReloj(separar[1])
+		crearLog(separar[0], separar[1], separar[2])
 	} else if separar[0] == "update" {
 		//updateregistro(separar[1], separar[2])
 	} else {
-		//borrarregistro(separar[1])
+		borrarRegistro(separar[1])
+		updateReloj(separar[1])
+		crearLog(separar[0], separar[1], "-")
 	}
 	return &Message{Mensaje: "Recibido"}, nil
 }

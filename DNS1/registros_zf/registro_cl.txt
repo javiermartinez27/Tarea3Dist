@@ -1,1 +1,3 @@
-google.cl.127.9.0.1linio.cl.123.42.534
+google.cl IN A 19.0.0.1
+
+vinilosmania.cl IN A 19.192.1.0

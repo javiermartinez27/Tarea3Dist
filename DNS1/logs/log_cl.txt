@@ -1,0 +1,4 @@
+create google.cl 19.0.0.1
+create linio.cl 192.0.0.23
+create vinilosmania.cl 19.192.1.0
+delete linio.cl
