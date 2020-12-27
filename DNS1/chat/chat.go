@@ -102,16 +102,53 @@ func crearLog(accion string, registro string, ip string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if accion != "delete" {
+	if accion == "create" {
 		_, err2 := f.WriteString(accion + " " + registro + " " + ip + "\n")
 		if err2 != nil {
 			log.Fatal(err)
 		}
-	} else {
+	} else if accion == "delete" {
 		_, err2 := f.WriteString(accion + " " + registro + "\n")
 		if err2 != nil {
 			log.Fatal(err)
 		}
+	} else {
+		cambioSeparado := strings.Split(ip, ">")
+		ipOName := strings.ReplaceAll(cambioSeparado[1], "<", "")
+		_, err2 := f.WriteString(accion + " " + registro + " " + ipOName + "\n")
+		if err2 != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
+func updateRegistro(registro string, cambio string) {
+	registroSeparado := strings.Split(registro, ".")
+	nombre := "registros_zf/registro_" + registroSeparado[1] + ".txt"
+	input, err := ioutil.ReadFile(nombre)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	lines := strings.Split(string(input), "\n")
+
+	for i, line := range lines {
+		if strings.Contains(line, registro) {
+			cambioSeparado := strings.Split(cambio, ">")
+			if cambioSeparado[0] == "<IP" {
+				ipSep := strings.ReplaceAll(cambioSeparado[1], "<", "")
+				lines[i] = registro + " IN A " + ipSep
+			} else {
+				guardaIp := strings.Split(lines[i], " IN A ")
+				newName := strings.ReplaceAll(cambioSeparado[1], "<", "")
+				lines[i] = newName + " IN A " + guardaIp[1]
+			}
+		}
+	}
+	output := strings.Join(lines, "\n")
+	err = ioutil.WriteFile(nombre, []byte(output), 0644)
+	if err != nil {
+		log.Fatalln(err)
 	}
 }
 
@@ -123,7 +160,9 @@ func (s *Server) RecibirDeAdmin(ctx context.Context, in *Message) (*Message, err
 		updateReloj(separar[1])
 		crearLog(separar[0], separar[1], separar[2])
 	} else if separar[0] == "update" {
-		//updateregistro(separar[1], separar[2])
+		updateRegistro(separar[1], separar[2])
+		updateReloj(separar[1])
+		crearLog(separar[0], separar[1], separar[2])
 	} else {
 		borrarRegistro(separar[1])
 		updateReloj(separar[1])
