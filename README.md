@@ -9,7 +9,7 @@ Conexión entre admin y broker, luego admin y DNSs LOCAL
 
 # DNS
 
-- Crean todo lo que tengan que crear (registros ZF, logs y relojes). PERO la consistencia del admin no está hecha, por lo que no sé cómo reaccionan si se les manda un `update` o un `delete`.
+- Crean todo lo que tengan que crear (registros ZF, logs y relojes). Consistencia hecha.
 
 # Cliente
 
