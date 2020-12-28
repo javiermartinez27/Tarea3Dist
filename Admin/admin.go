@@ -14,7 +14,6 @@ import (
 
 func sendToDNS(puerto string, accion string) string {
 	var conn *grpc.ClientConn
-	puerto = ":9001"
 	conn, err := grpc.Dial(puerto, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("No se logró conectar: %s", err)
