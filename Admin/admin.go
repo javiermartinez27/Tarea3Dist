@@ -12,6 +12,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+var consistencia [][]string
+
 func sendToDNS(puerto string, accion string) string {
 	var conn *grpc.ClientConn
 	conn, err := grpc.Dial(puerto, grpc.WithInsecure())
@@ -57,9 +59,21 @@ func main() {
 		}
 
 		check := strings.Split(comando, " ")
-		if check[0] == "create" || check[0] == "update" || check[0] == "delete" {
+		if check[0] == "create" {
 			puerto := sendAccion(comando)
-			fmt.Println(sendToDNS(puerto, comando))
+			reloj := sendToDNS(puerto, comando)
+			fmt.Println(reloj)
+			paraAppend := []string{check[1], puerto, reloj}
+			consistencia = append(consistencia, paraAppend)
+		} else if check[0] == "update" || check[0] == "delete" {
+			for _, s := range consistencia {
+				if s[0] == check[1] {
+					puerto := s[1]
+					reloj := sendToDNS(puerto, comando)
+					fmt.Println(reloj)
+					break
+				}
+			}
 		} else {
 			fmt.Println("Por favor, ingrese un comando válido")
 		}

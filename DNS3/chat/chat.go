@@ -44,7 +44,7 @@ func readLines(path string) ([]string, error) {
 	return lines, scanner.Err()
 }
 
-func updateReloj(registro string) {
+func updateReloj(registro string) string {
 	registroSeparado := strings.Split(registro, ".")
 	nombre := "relojes/reloj_" + registroSeparado[1] + ".txt"
 	if _, err := os.Stat(nombre); err == nil { //actualiza el reloj
@@ -56,11 +56,12 @@ func updateReloj(registro string) {
 		i, err := strconv.Atoi(separar[2]) //cambiar en DNS2 y 3
 		i++
 		s := strconv.Itoa(i)
-		newReloj := "0,0," + s //cambiar en otros DNS
+		newReloj := separar[0] + "," + separar[1] + "," + s //cambiar en otros DNS
 		err = ioutil.WriteFile(nombre, []byte(newReloj), 0644)
 		if err != nil {
 			log.Fatalln(err)
 		}
+		return newReloj
 	} else { //primera vez que se añade algo a este registro
 		f, err := os.OpenFile(nombre, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
@@ -70,6 +71,7 @@ func updateReloj(registro string) {
 		if err2 != nil {
 			log.Fatal(err)
 		}
+		return "0,0,1"
 	}
 }
 
@@ -155,18 +157,19 @@ func updateRegistro(registro string, cambio string) {
 func (s *Server) RecibirDeAdmin(ctx context.Context, in *Message) (*Message, error) { //cuando un admin envia una peticion
 	log.Printf("Administrador envía petición: %s", in.Mensaje)
 	separar := strings.Split(in.Mensaje, " ")
+	var respuesta string
 	if separar[0] == "create" {
 		crearRegistro(separar[1], separar[2])
-		updateReloj(separar[1])
+		respuesta = updateReloj(separar[1])
 		crearLog(separar[0], separar[1], separar[2])
 	} else if separar[0] == "update" {
 		updateRegistro(separar[1], separar[2])
-		updateReloj(separar[1])
+		respuesta = updateReloj(separar[1])
 		crearLog(separar[0], separar[1], separar[2])
 	} else {
 		borrarRegistro(separar[1])
-		updateReloj(separar[1])
+		respuesta = updateReloj(separar[1])
 		crearLog(separar[0], separar[1], "-")
 	}
-	return &Message{Mensaje: "Recibido"}, nil
+	return &Message{Mensaje: respuesta}, nil
 }
