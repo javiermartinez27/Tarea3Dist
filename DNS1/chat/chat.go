@@ -154,6 +154,25 @@ func updateRegistro(registro string, cambio string) {
 	}
 }
 
+func buscarIp(registro string) string { //Encargada de buscar la Ip solicitada
+	registroSeparado := strings.Split(registro, ".")
+	nombre := "registros_zf/registro_" + registroSeparado[1] + ".txt"
+	input, err := ioutil.ReadFile(nombre)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	lines := strings.Split(string(input), "\n")
+
+	for i, line := range lines {
+		if strings.Contains(line, registro) {
+			lineaserapada := strings.Split(lines[i], " ")
+			return lineaserapada[3]
+		}
+	}
+	return "No encontrada"
+}
+
 func (s *Server) RecibirDeAdmin(ctx context.Context, in *Message) (*Message, error) { //cuando un admin envia una peticion
 	log.Printf("Administrador envía petición: %s", in.Mensaje)
 	separar := strings.Split(in.Mensaje, " ")
@@ -170,6 +189,17 @@ func (s *Server) RecibirDeAdmin(ctx context.Context, in *Message) (*Message, err
 		borrarRegistro(separar[1])
 		respuesta = updateReloj(separar[1])
 		crearLog(separar[0], separar[1], "-")
+	}
+	return &Message{Mensaje: respuesta}, nil
+}
+
+func (s *Server) RecibirDeCliente(ctx context.Context, in *Message) (*Message, error) { //cuando un cliente envia una peticion
+	log.Printf("Cliente envia petición: %s", in.Mensaje)
+	separar := strings.Split(in.Mensaje, " ")
+	var respuesta string
+	if separar[0] == "get" {
+		IpEncontrada := buscarIp(separar[1])
+		respuesta = updateReloj(separar[1]) + " " + IpEncontrada
 	}
 	return &Message{Mensaje: respuesta}, nil
 }

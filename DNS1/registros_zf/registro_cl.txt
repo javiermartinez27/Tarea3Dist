@@ -1,3 +1,5 @@
 google.cl IN A 19.0.0.1
 
 vinilosmania.cl IN A 19.192.1.0
+test.cl IN A 20.0.0.1
+test.cl IN A 123.0.0.5
