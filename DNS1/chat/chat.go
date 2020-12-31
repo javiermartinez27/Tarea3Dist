@@ -206,5 +206,12 @@ func (s *Server) RecibirDeCliente(ctx context.Context, in *Message) (*Message, e
 
 func (s *Server) RecibirDeBroker(ctx context.Context, in *Message) (*Message, error) { //cuando un cliente envia una peticion
 	log.Printf("Cliente envia petición: %s", in.Mensaje)
-	return &Message{Mensaje: "get recibido"}, nil
+	separar := strings.Split(in.Mensaje, " ")
+	var respuesta string
+	if separar[0] == "get" {
+		IpEncontrada := buscarIp(separar[1])
+		respuesta = updateReloj(separar[1]) + " " + IpEncontrada + " " + separar[2]
+	}
+	return &Message{Mensaje: respuesta}, nil
+
 }

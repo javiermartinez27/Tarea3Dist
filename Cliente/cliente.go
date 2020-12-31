@@ -12,6 +12,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+var consistencia [][]string
+
 func sendToBroker(accion string) string {
 	var conn *grpc.ClientConn
 	conn, err := grpc.Dial(":9000", grpc.WithInsecure())
@@ -35,12 +37,84 @@ func main() {
 	for scanner.Scan() {
 		comando := scanner.Text()
 		if comando == "exit" {
+			fmt.Println("Informacion de los dominios que ha solicitado:")
+			fmt.Println(consistencia)
 			fmt.Println("Saliendo...")
 			break
 		}
 		check := strings.Split(comando, " ")
 		if check[0] == "get" {
-			fmt.Println(sendToBroker(comando))
+			mensaje := sendToBroker(comando) //string
+			fmt.Println("Mensaje:")
+			fmt.Println(mensaje)
+			if len(consistencia) == 0 {
+				paraAppend := []string{check[1], mensaje}
+				consistencia = append(consistencia, paraAppend)
+				// fmt.Println(consistencia)
+				// fmt.Println(reflect.TypeOf(consistencia))
+				// fmt.Println("if")
+			} else {
+				for i, s := range consistencia {
+					// mensaje := sendToBroker(comando)
+					// fmt.Println(s)
+
+					fmt.Println("esto es s")
+					fmt.Println(s)
+
+					// fmt.Println("esto es s como string")
+					// fmt.Println(strings.Join(s, " "))
+
+					// fmt.Println("esto es check[1]")
+					// fmt.Println(check[1])
+					// fmt.Println("esto es type of check[1]")
+					// fmt.Println(reflect.TypeOf(check[1]))
+					// fmt.Println("esto es check[1] +  mensaje")
+					// test := check[1] + " " + mensaje
+					// fmt.Println(test)
+					// sComoString := strings.Join(s, " ")
+					// fmt.Println(strings.Contains(sComoString, check[1]))
+					relojObtenidoDelMensaje := strings.Split(mensaje, " ")
+					fmt.Println("Reloj Obtenido")
+					fmt.Println(relojObtenidoDelMensaje[0])
+
+					// fmt.Println("esto es mensaje+check[1]")
+					// test2 := mensaje + " " + check[1]
+					// fmt.Println(test2)
+					if s[i] == check[1] {
+						fmt.Println("pase por aqui")
+
+						s = []string{check[1], mensaje}
+						consistencia[i] = s
+					} // else {
+					// 	paraAppend := []string{check[1], mensaje}
+					// 	consistencia = append(consistencia, paraAppend)
+					// 	fmt.Println(consistencia)
+					// 	fmt.Println("else")
+					// }
+					// // paraAppend := []string{check[1], mensaje}
+					// // consistencia = append(consistencia, paraAppend)
+				}
+			}
+			// for i, s := range consistencia {
+			// 	mensaje := sendToBroker(comando)
+			// 	fmt.Println(len(consistencia))
+
+			// 	if s[i] == check[1] {
+			// 		fmt.Println("lo contiene")
+			// 		s = []string{mensaje}
+			// 		consistencia[i] = s
+			// 	} else {
+			// 		fmt.Println("tessst")
+			// 		paraAppend := []string{check[1], mensaje}
+			// 		consistencia = append(consistencia, paraAppend)
+			// 	}
+			// 	paraAppend := []string{check[1], mensaje}
+			// 	consistencia = append(consistencia, paraAppend)
+			// }
+			// mensaje := sendToBroker(comando)
+			// fmt.Println(mensaje)
+			// paraAppend := []string{check[1], mensaje}
+			// consistencia = append(consistencia, paraAppend)
 		} else {
 			fmt.Println("Por favor, ingrese un comando válido")
 		}
