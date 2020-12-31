@@ -3,4 +3,3 @@ vinilosmania.cl IN A 19.192.1.0
 test.cl IN A 20.0.0.1
 test.cl IN A 123.0.0.5
 a.cl IN A 1.2.3.4
-asd.cl IN A 1.2.3.4
