@@ -4,3 +4,4 @@ create vinilosmania.cl 19.192.1.0
 delete linio.cl
 create test.cl 20.0.0.1
 create test.cl 123.0.0.5
+create asd.cl 1.2.3.4

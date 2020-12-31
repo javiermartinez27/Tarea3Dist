@@ -2,6 +2,7 @@ package chat
 
 import (
 	"bufio"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -42,6 +43,29 @@ func readLines(path string) ([]string, error) {
 		lines = append(lines, scanner.Text())
 	}
 	return lines, scanner.Err()
+}
+
+func leerReloj(registro string) string { //funcion encargada de leer el Reloj actual
+	registroSeparado := strings.Split(registro, ".")
+	nombre := "relojes/reloj_" + registroSeparado[1] + ".txt"
+	if _, err := os.Stat(nombre); err == nil { //actualiza el reloj
+		reloj, err := readLines(nombre)
+		relojComoString := strings.Join(reloj, " ")
+		if err != nil {
+			log.Fatal(err)
+		}
+		return relojComoString
+	} else { //primera vez que se añade algo a este registro
+		f, err := os.OpenFile(nombre, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, err2 := f.WriteString("1,0,0")
+		if err2 != nil {
+			log.Fatal(err)
+		}
+		return "1,0,0"
+	}
 }
 
 func updateReloj(registro string) string {
@@ -194,14 +218,7 @@ func (s *Server) RecibirDeAdmin(ctx context.Context, in *Message) (*Message, err
 }
 
 func (s *Server) RecibirDeCliente(ctx context.Context, in *Message) (*Message, error) { //cuando un cliente envia una peticion
-	log.Printf("Cliente envia petición: %s", in.Mensaje)
-	separar := strings.Split(in.Mensaje, " ")
-	var respuesta string
-	if separar[0] == "get" {
-		IpEncontrada := buscarIp(separar[1])
-		respuesta = updateReloj(separar[1]) + " " + IpEncontrada
-	}
-	return &Message{Mensaje: respuesta}, nil
+	return &Message{Mensaje: "aqui no llega dns2"}, nil
 }
 
 func (s *Server) RecibirDeBroker(ctx context.Context, in *Message) (*Message, error) { //cuando un cliente envia una peticion
@@ -210,7 +227,11 @@ func (s *Server) RecibirDeBroker(ctx context.Context, in *Message) (*Message, er
 	var respuesta string
 	if separar[0] == "get" {
 		IpEncontrada := buscarIp(separar[1])
-		respuesta = updateReloj(separar[1]) + " " + IpEncontrada + " " + separar[2]
+		reloj := leerReloj(separar[1])
+		ipDNS1 := "9002"
+		respuesta = ipDNS1 + " " + reloj + " " + IpEncontrada
+		// fmt.Println("ESTO ES MENSAJE QUE SE ENVIA DNS1 TO BROKER")
+		fmt.Println(respuesta)
 	}
 	return &Message{Mensaje: respuesta}, nil
 

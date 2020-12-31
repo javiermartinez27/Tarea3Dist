@@ -38,83 +38,54 @@ func main() {
 		comando := scanner.Text()
 		if comando == "exit" {
 			fmt.Println("Informacion de los dominios que ha solicitado:")
-			fmt.Println(consistencia)
+			fmt.Printf("%+q", consistencia)
+			fmt.Println("")
 			fmt.Println("Saliendo...")
 			break
 		}
 		check := strings.Split(comando, " ")
-		if check[0] == "get" {
-			mensaje := sendToBroker(comando) //string
-			fmt.Println("Mensaje:")
-			fmt.Println(mensaje)
+		if check[0] == "get" { //Funcion encargada de mandar los get al broker para despues recibir los mensajes desde este.
+			mensaje := sendToBroker(comando)
 			if len(consistencia) == 0 {
-				paraAppend := []string{check[1], mensaje}
+				paraAppend := []string{check[1] + " " + mensaje}
 				consistencia = append(consistencia, paraAppend)
-				// fmt.Println(consistencia)
-				// fmt.Println(reflect.TypeOf(consistencia))
-				// fmt.Println("if")
+				fmt.Println("Recibido:")
+				fmt.Printf("%+q", paraAppend)
+				fmt.Println("")
 			} else {
-				for i, s := range consistencia {
-					// mensaje := sendToBroker(comando)
-					// fmt.Println(s)
+				actualizar := 0 // nos dice si debemos actualizar alguna informacion en memoria, de los dominios que se han solicitado.
+				aux := ""       //sera usado para guardar el slice que luego debe coincidir en el otro for, asi actuliza correctamente el slice correspondiente.
+				for _, s := range consistencia {
+					sComoString := strings.Join(s, " ")
+					if strings.Contains(sComoString, check[1]) { //funcion encargada de actualizar dominio
+						actualizar = 1
+						aux = sComoString
+						break
+					}
 
-					fmt.Println("esto es s")
-					fmt.Println(s)
-
-					// fmt.Println("esto es s como string")
-					// fmt.Println(strings.Join(s, " "))
-
-					// fmt.Println("esto es check[1]")
-					// fmt.Println(check[1])
-					// fmt.Println("esto es type of check[1]")
-					// fmt.Println(reflect.TypeOf(check[1]))
-					// fmt.Println("esto es check[1] +  mensaje")
-					// test := check[1] + " " + mensaje
-					// fmt.Println(test)
-					// sComoString := strings.Join(s, " ")
-					// fmt.Println(strings.Contains(sComoString, check[1]))
-					relojObtenidoDelMensaje := strings.Split(mensaje, " ")
-					fmt.Println("Reloj Obtenido")
-					fmt.Println(relojObtenidoDelMensaje[0])
-
-					// fmt.Println("esto es mensaje+check[1]")
-					// test2 := mensaje + " " + check[1]
-					// fmt.Println(test2)
-					if s[i] == check[1] {
-						fmt.Println("pase por aqui")
-
-						s = []string{check[1], mensaje}
-						consistencia[i] = s
-					} // else {
-					// 	paraAppend := []string{check[1], mensaje}
-					// 	consistencia = append(consistencia, paraAppend)
-					// 	fmt.Println(consistencia)
-					// 	fmt.Println("else")
-					// }
-					// // paraAppend := []string{check[1], mensaje}
-					// // consistencia = append(consistencia, paraAppend)
 				}
-			}
-			// for i, s := range consistencia {
-			// 	mensaje := sendToBroker(comando)
-			// 	fmt.Println(len(consistencia))
+				for i, s := range consistencia {
+					sComoString := strings.Join(s, " ")
+					if actualizar == 1 && aux == sComoString { //si se debe actualizar pasa por aqui, sComoString debe coincidir con el sComoString del for pasado para que este actualice
+						paraAppend := []string{check[1] + " " + mensaje}
+						consistencia[i] = paraAppend
+						fmt.Printf("%+q", paraAppend)
+						fmt.Println("")
+						break
+					}
+					if actualizar != 1 { //si no se cumple lo anterior simplemente se agrega.
+						// fmt.Println("lo agregue :(")
+						paraAppend := []string{check[1] + " " + mensaje}
+						consistencia = append(consistencia, paraAppend)
+						// fmt.Println("Recibido en el else:")
+						fmt.Printf("%+q", paraAppend)
+						fmt.Println("")
+						break
+					}
 
-			// 	if s[i] == check[1] {
-			// 		fmt.Println("lo contiene")
-			// 		s = []string{mensaje}
-			// 		consistencia[i] = s
-			// 	} else {
-			// 		fmt.Println("tessst")
-			// 		paraAppend := []string{check[1], mensaje}
-			// 		consistencia = append(consistencia, paraAppend)
-			// 	}
-			// 	paraAppend := []string{check[1], mensaje}
-			// 	consistencia = append(consistencia, paraAppend)
-			// }
-			// mensaje := sendToBroker(comando)
-			// fmt.Println(mensaje)
-			// paraAppend := []string{check[1], mensaje}
-			// consistencia = append(consistencia, paraAppend)
+				}
+
+			}
 		} else {
 			fmt.Println("Por favor, ingrese un comando válido")
 		}

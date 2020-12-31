@@ -1,6 +1,7 @@
 package chat
 
 import (
+	"fmt"
 	"log"
 
 	"golang.org/x/net/context"
@@ -48,15 +49,21 @@ func (s *Server) RecibirDeCliente(ctx context.Context, in *Message) (*Message, e
 	log.Printf("Cliente solicita servidor DNS. Petición: %s", in.Mensaje)
 	if ipActual == 1 {
 		ipActual++
-		IpResponse := sendToDNS(in.Mensaje+" 9001", ":9001")
+		fmt.Println("BROKER TO DNS1")
+		fmt.Println(in.Mensaje)
+		IpResponse := sendToDNS(in.Mensaje, ":9001")
 		return &Message{Mensaje: IpResponse}, nil //10.10.28.155
 	} else if ipActual == 2 {
 		ipActual++
-		IpResponse := sendToDNS(in.Mensaje+" 9002", ":9002")
+		fmt.Println("BROKER TO DNS2")
+		fmt.Println(in.Mensaje)
+		IpResponse := sendToDNS(in.Mensaje, ":9002")
 		return &Message{Mensaje: IpResponse}, nil //10.10.28.156
 	} else {
 		ipActual = 1
-		IpResponse := sendToDNS(in.Mensaje+" 9003", ":9003")
+		fmt.Println("BROKER TO DNS3")
+		fmt.Println(in.Mensaje)
+		IpResponse := sendToDNS(in.Mensaje, ":9003")
 		return &Message{Mensaje: IpResponse}, nil //10.10.28.157
 	}
 	return &Message{Mensaje: "10.10.28.157"}, nil //No debería llegar aqui
