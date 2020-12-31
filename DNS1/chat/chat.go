@@ -2,6 +2,7 @@ package chat
 
 import (
 	"bufio"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -172,4 +173,29 @@ func (s *Server) RecibirDeAdmin(ctx context.Context, in *Message) (*Message, err
 		crearLog(separar[0], separar[1], "-")
 	}
 	return &Message{Mensaje: respuesta}, nil
+}
+
+func recopilaLogs() {
+	files, err := ioutil.ReadDir("logs")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, file := range files {
+		fmt.Println(file.Name())
+	}
+}
+
+func (s *Server) Consistencia(ctx context.Context, in *Message) (*Message, error) { //cuando un admin envia una peticion
+	log.Printf("Iniciando consistencia")
+	if in.Mensaje == "inicio" {
+		//enviar logs
+	} else {
+		//actualizar todo
+	}
+	return &Message{Mensaje: "Respuesta consistencia"}, nil
+}
+
+func (s *Server) VueltaArchivos(ctx context.Context, in *Archivos) (*Message, error) { //cuando un admin envia una peticion
+	return &Message{Mensaje: "consistencia lista"}, nil
 }
