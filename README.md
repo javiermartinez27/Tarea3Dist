@@ -12,7 +12,7 @@ Conexión entre admin y broker, luego admin y DNSs LOCAL
 
 # DNS
 
-- Crean todo lo que tengan que crear (registros ZF, logs y relojes) y hacen un merge cada 5 minutos.
+- Crean todo lo que tengan que crear (registros ZF, logs y relojes) y hacen un merge cada 5 minutos (consistencia eventual hecha).
 
 # Cliente
 
