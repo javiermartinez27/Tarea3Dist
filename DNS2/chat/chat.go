@@ -220,7 +220,6 @@ func (s *Server) RecibirDeAdmin(ctx context.Context, in *Message) (*Message, err
 func (s *Server) RecibirDeCliente(ctx context.Context, in *Message) (*Message, error) { //cuando un cliente envia una peticion
 	return &Message{Mensaje: "aqui no llega dns2"}, nil
 }
-
 func (s *Server) RecibirDeBroker(ctx context.Context, in *Message) (*Message, error) { //cuando un cliente envia una peticion
 	log.Printf("Cliente envia petición: %s", in.Mensaje)
 	separar := strings.Split(in.Mensaje, " ")
@@ -234,5 +233,55 @@ func (s *Server) RecibirDeBroker(ctx context.Context, in *Message) (*Message, er
 		fmt.Println(respuesta)
 	}
 	return &Message{Mensaje: respuesta}, nil
+
+
+func extraeInfo(nombre string) []string {
+	input, err := ioutil.ReadFile("logs/" + nombre)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	lines := strings.Split(string(input), "\n")
+	return lines
+}
+
+func recopilaLogs() []string {
+	var infoLogs []string
+	files, err := ioutil.ReadDir("logs")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, file := range files {
+		info := extraeInfo(file.Name())
+		output := strings.Join(info, "+")
+		infoLogs = append(infoLogs, output)
+	}
+	return infoLogs
+}
+
+func escribirArchivo(archivo []byte, nombre string) {
+	file, err := os.OpenFile(nombre, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	_, err2 := file.Write(archivo)
+	if err2 != nil {
+		log.Fatal(err)
+	}
+}
+
+func (s *Server) Consistencia(ctx context.Context, in *Message) (*Message, error) { //cuando un admin envia una peticion
+	log.Printf("Iniciando consistencia")
+	var logs []string
+	logs = recopilaLogs()
+	return &Message{ConsistenciaList: logs}, nil
+}
+
+func (s *Server) VueltaArchivos(ctx context.Context, in *Archivos) (*Message, error) { //cuando un admin envia una peticion
+	escribirArchivo(in.Registro, "registros_zf/registro_"+in.Nombre+".txt")
+	escribirArchivo(in.Otroarchivo, "logs/log_"+in.Nombre+".txt")
+	escribirArchivo(in.Reloj, "relojes/reloj_"+in.Nombre+".txt")
+	return &Message{Mensaje: "Consistencia lista con dominio ." + in.Nombre + " en DNS2"}, nil
 
 }

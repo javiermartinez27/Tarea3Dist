@@ -217,11 +217,35 @@ func (s *Server) RecibirDeAdmin(ctx context.Context, in *Message) (*Message, err
 	return &Message{Mensaje: respuesta}, nil
 }
 
+func recopilaLogs() {
+	files, err := ioutil.ReadDir("logs")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, file := range files {
+		fmt.Println(file.Name())
+	}
+}
+
+func (s *Server) Consistencia(ctx context.Context, in *Message) (*Message, error) { //cuando un admin envia una peticion
+	log.Printf("Iniciando consistencia")
+	if in.Mensaje == "inicio" {
+		//enviar logs
+	} else {
+		//actualizar todo
+	}
+	return &Message{Mensaje: "Respuesta consistencia"}, nil
+}
+
+func (s *Server) VueltaArchivos(ctx context.Context, in *Archivos) (*Message, error) { //cuando un admin envia una peticion
+	return &Message{Mensaje: "consistencia lista"}, nil
+}
 func (s *Server) RecibirDeCliente(ctx context.Context, in *Message) (*Message, error) { //cuando un cliente envia una peticion
 	return &Message{Mensaje: "aqui no llega dn1"}, nil
 }
 
-func (s *Server) RecibirDeBroker(ctx context.Context, in *Message) (*Message, error) { //cuando un cliente envia una peticion
+func (s *Server) RecibirDeBroker(ctx context.Context, in *Message) (*Message, error) { //cuando un cliente envia envia una peticion al broker
 	log.Printf("Cliente envia petición: %s", in.Mensaje)
 	separar := strings.Split(in.Mensaje, " ")
 	var respuesta string
@@ -235,4 +259,3 @@ func (s *Server) RecibirDeBroker(ctx context.Context, in *Message) (*Message, er
 	}
 	return &Message{Mensaje: respuesta}, nil
 
-}
