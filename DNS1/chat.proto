@@ -15,6 +15,8 @@ message Archivos {
 
 service ChatService {
   rpc RecibirDeAdmin(Message) returns (Message) {}
+  rpc RecibirDeCliente(Message) returns (Message) {}
+  rpc RecibirDeBroker(Message) returns (Message) {}
   rpc Consistencia(Message) returns (Message) {}
   rpc VueltaArchivos(Archivos) returns (Message) {}
 }

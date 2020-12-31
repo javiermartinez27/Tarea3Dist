@@ -204,6 +204,11 @@ var file_chat_proto_goTypes = []interface{}{
 }
 var file_chat_proto_depIdxs = []int32{
 	0, // 0: chat.ChatService.RecibirDeAdmin:input_type -> chat.Message
+	0, // 1: chat.ChatService.RecibirDeCliente:input_type -> chat.Message
+	0, // 2: chat.ChatService.RecibirDeBroker:input_type -> chat.Message
+	0, // 3: chat.ChatService.RecibirDeAdmin:output_type -> chat.Message
+	0, // 4: chat.ChatService.RecibirDeCliente:output_type -> chat.Message
+	0, // 5: chat.ChatService.RecibirDeBroker:output_type -> chat.Message
 	0, // 1: chat.ChatService.Consistencia:input_type -> chat.Message
 	1, // 2: chat.ChatService.VueltaArchivos:input_type -> chat.Archivos
 	0, // 3: chat.ChatService.RecibirDeAdmin:output_type -> chat.Message
@@ -280,6 +285,8 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ChatServiceClient interface {
 	RecibirDeAdmin(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error)
+	RecibirDeCliente(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error)
+	RecibirDeBroker(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error)
 	Consistencia(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error)
 	VueltaArchivos(ctx context.Context, in *Archivos, opts ...grpc.CallOption) (*Message, error)
 }
@@ -301,6 +308,9 @@ func (c *chatServiceClient) RecibirDeAdmin(ctx context.Context, in *Message, opt
 	return out, nil
 }
 
+func (c *chatServiceClient) RecibirDeCliente(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error) {
+	out := new(Message)
+	err := c.cc.Invoke(ctx, "/chat.ChatService/RecibirDeCliente", in, out, opts...)
 func (c *chatServiceClient) Consistencia(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error) {
 	out := new(Message)
 	err := c.cc.Invoke(ctx, "/chat.ChatService/Consistencia", in, out, opts...)
@@ -309,7 +319,9 @@ func (c *chatServiceClient) Consistencia(ctx context.Context, in *Message, opts 
 	}
 	return out, nil
 }
-
+func (c *chatServiceClient) RecibirDeBroker(ctx context.Context, in *Message, opts ...grpc.CallOption) (*Message, error) {
+	out := new(Message)
+	err := c.cc.Invoke(ctx, "/chat.ChatService/RecibirDeBroker", in, out, opts...)
 func (c *chatServiceClient) VueltaArchivos(ctx context.Context, in *Archivos, opts ...grpc.CallOption) (*Message, error) {
 	out := new(Message)
 	err := c.cc.Invoke(ctx, "/chat.ChatService/VueltaArchivos", in, out, opts...)
@@ -322,6 +334,8 @@ func (c *chatServiceClient) VueltaArchivos(ctx context.Context, in *Archivos, op
 // ChatServiceServer is the server API for ChatService service.
 type ChatServiceServer interface {
 	RecibirDeAdmin(context.Context, *Message) (*Message, error)
+	RecibirDeCliente(context.Context, *Message) (*Message, error)
+	RecibirDeBroker(context.Context, *Message) (*Message, error)
 	Consistencia(context.Context, *Message) (*Message, error)
 	VueltaArchivos(context.Context, *Archivos) (*Message, error)
 }
@@ -333,6 +347,11 @@ type UnimplementedChatServiceServer struct {
 func (*UnimplementedChatServiceServer) RecibirDeAdmin(context.Context, *Message) (*Message, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RecibirDeAdmin not implemented")
 }
+func (*UnimplementedChatServiceServer) RecibirDeCliente(context.Context, *Message) (*Message, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RecibirDeCliente not implemented")
+}
+func (*UnimplementedChatServiceServer) RecibirDeBroker(context.Context, *Message) (*Message, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RecibirDeBroker not implemented")
 func (*UnimplementedChatServiceServer) Consistencia(context.Context, *Message) (*Message, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Consistencia not implemented")
 }
@@ -362,12 +381,21 @@ func _ChatService_RecibirDeAdmin_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ChatService_RecibirDeCliente_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 func _ChatService_Consistencia_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Message)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
+		return srv.(ChatServiceServer).RecibirDeCliente(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chat.ChatService/RecibirDeCliente",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChatServiceServer).RecibirDeCliente(ctx, req.(*Message))
 		return srv.(ChatServiceServer).Consistencia(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
@@ -380,12 +408,22 @@ func _ChatService_Consistencia_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ChatService_RecibirDeBroker_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Message)
 func _ChatService_VueltaArchivos_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Archivos)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
+		return srv.(ChatServiceServer).RecibirDeBroker(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chat.ChatService/RecibirDeBroker",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChatServiceServer).RecibirDeBroker(ctx, req.(*Message))
 		return srv.(ChatServiceServer).VueltaArchivos(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
@@ -407,6 +445,12 @@ var _ChatService_serviceDesc = grpc.ServiceDesc{
 			Handler:    _ChatService_RecibirDeAdmin_Handler,
 		},
 		{
+			MethodName: "RecibirDeCliente",
+			Handler:    _ChatService_RecibirDeCliente_Handler,
+		},
+		{
+			MethodName: "RecibirDeBroker",
+			Handler:    _ChatService_RecibirDeBroker_Handler,
 			MethodName: "Consistencia",
 			Handler:    _ChatService_Consistencia_Handler,
 		},

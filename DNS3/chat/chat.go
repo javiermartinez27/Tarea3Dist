@@ -2,6 +2,7 @@ package chat
 
 import (
 	"bufio"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -44,6 +45,29 @@ func readLines(path string) ([]string, error) {
 	return lines, scanner.Err()
 }
 
+func leerReloj(registro string) string { //funcion encargada de leer el Reloj actual
+	registroSeparado := strings.Split(registro, ".")
+	nombre := "relojes/reloj_" + registroSeparado[1] + ".txt"
+	if _, err := os.Stat(nombre); err == nil { //actualiza el reloj
+		reloj, err := readLines(nombre)
+		relojComoString := strings.Join(reloj, " ")
+		if err != nil {
+			log.Fatal(err)
+		}
+		return relojComoString
+	} else { //primera vez que se añade algo a este registro
+		f, err := os.OpenFile(nombre, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, err2 := f.WriteString("1,0,0")
+		if err2 != nil {
+			log.Fatal(err)
+		}
+		return "1,0,0"
+	}
+}
+
 func updateReloj(registro string) string {
 	registroSeparado := strings.Split(registro, ".")
 	nombre := "relojes/reloj_" + registroSeparado[1] + ".txt"
@@ -53,10 +77,10 @@ func updateReloj(registro string) string {
 			log.Fatal(err)
 		}
 		separar := strings.Split(reloj[0], ",")
-		i, err := strconv.Atoi(separar[2]) //cambiar en DNS2 y 3
+		i, err := strconv.Atoi(separar[0]) //cambiar en DNS2 y 3
 		i++
 		s := strconv.Itoa(i)
-		newReloj := separar[0] + "," + separar[1] + "," + s //cambiar en otros DNS
+		newReloj := s + "," + separar[1] + "," + separar[2] //cambiar en otros DNS
 		err = ioutil.WriteFile(nombre, []byte(newReloj), 0644)
 		if err != nil {
 			log.Fatalln(err)
@@ -67,11 +91,11 @@ func updateReloj(registro string) string {
 		if err != nil {
 			log.Fatal(err)
 		}
-		_, err2 := f.WriteString("0,0,1")
+		_, err2 := f.WriteString("1,0,0")
 		if err2 != nil {
 			log.Fatal(err)
 		}
-		return "0,0,1"
+		return "1,0,0"
 	}
 }
 
@@ -154,6 +178,25 @@ func updateRegistro(registro string, cambio string) {
 	}
 }
 
+func buscarIp(registro string) string { //Encargada de buscar la Ip solicitada
+	registroSeparado := strings.Split(registro, ".")
+	nombre := "registros_zf/registro_" + registroSeparado[1] + ".txt"
+	input, err := ioutil.ReadFile(nombre)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	lines := strings.Split(string(input), "\n")
+
+	for i, line := range lines {
+		if strings.Contains(line, registro) {
+			lineaserapada := strings.Split(lines[i], " ")
+			return lineaserapada[3]
+		}
+	}
+	return "No encontrada"
+}
+
 func (s *Server) RecibirDeAdmin(ctx context.Context, in *Message) (*Message, error) { //cuando un admin envia una peticion
 	log.Printf("Administrador envía petición: %s", in.Mensaje)
 	separar := strings.Split(in.Mensaje, " ")
@@ -173,6 +216,26 @@ func (s *Server) RecibirDeAdmin(ctx context.Context, in *Message) (*Message, err
 	}
 	return &Message{Mensaje: respuesta}, nil
 }
+
+
+func (s *Server) RecibirDeCliente(ctx context.Context, in *Message) (*Message, error) { //cuando un cliente envia una peticion
+	return &Message{Mensaje: "aqui no llega dn3"}, nil
+}
+
+func (s *Server) RecibirDeBroker(ctx context.Context, in *Message) (*Message, error) { //cuando un cliente envia una peticion
+	log.Printf("Cliente envia petición: %s", in.Mensaje)
+	separar := strings.Split(in.Mensaje, " ")
+	var respuesta string
+	if separar[0] == "get" {
+		IpEncontrada := buscarIp(separar[1])
+		reloj := leerReloj(separar[1])
+		ipDNS1 := "9003"
+		respuesta = ipDNS1 + " " + reloj + " " + IpEncontrada
+		// fmt.Println("ESTO ES MENSAJE QUE SE ENVIA DNS1 TO BROKER")
+		fmt.Println(respuesta)
+	}
+	return &Message{Mensaje: respuesta}, nil
+
 
 func extraeInfo(nombre string) []string {
 	input, err := ioutil.ReadFile("logs/" + nombre)

@@ -10,6 +10,9 @@ import (
 	"google.golang.org/grpc"
 )
 
+type Server struct {
+}
+
 func escuchar() {
 	puerto := 9000
 	fmt.Println("Broker escuchando en el puerto " + strconv.Itoa(puerto))
